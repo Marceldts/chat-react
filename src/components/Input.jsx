@@ -102,6 +102,7 @@ const InputWrapper = styled.div`
 const PhotoPreview = styled.img`
   height: 100px;
   margin: 10px;
+  border-radius: 50%;
 `;
 
 const PhotoContainer = styled.div`
