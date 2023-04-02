@@ -8,11 +8,16 @@ import { emailValidator, passwordValidator } from "../utils/Validators";
 
 export const RegisterPage = () => {
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [usernameError, setUsernameError] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [photoError, setPhotoError] = useState('');
     const [password, setPassword] = useState('');
     const [confirmedPassword, setConfirmedPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [valid, setValid] = useState(false);
+
 
     const navigate = useNavigate();
 
@@ -21,8 +26,12 @@ export const RegisterPage = () => {
     }, []);
 
     useEffect(() => {
-        setValid(emailValidator(email) && passwordValidator(password));
-    }, [email, password]);
+        console.log(photo)
+    }, [photo]);
+
+    useEffect(() => {
+        setValid(emailValidator(email) && passwordValidator(password) && password === confirmedPassword && username !== '');
+    }, [email, password, username]);
 
     const validateEmail = (value) => {
         setEmail(value);
@@ -38,23 +47,37 @@ export const RegisterPage = () => {
     const validatePassword = (value) => {
         if (value === '') {
             setPasswordError('');
-        } else if (!passwordValidator(value)) {
-            setPasswordError('La contraseña no es válida');
         } else if (password !== confirmedPassword && confirmedPassword !== '') {
             setPasswordError('Las contraseñas no coinciden');
-        }
-        else {
+        } else if (!passwordValidator(value)) {
+            setPasswordError('La contraseña no es válida');
+        } else {
             setPasswordError('');
         }
+    }
+
+    function getPhoto(photo) {
+        setPhoto(photo)
     }
 
     return (
         <RegisterPageContainer>
             <h1>¡Bienvenido a este chat!</h1>
-            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} value={email} onBlur={(e) => validateEmail(e.target.value)} />
-            <StyledInput id="passwordInput" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} value={password} onBlur={(e) => validatePassword(e.target.value)} />
-            <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} value={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} />
-
+            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} defaultValue={email} onBlur={(e) => validateEmail(e.target.value)} />
+            <StyledInput id="usernameInput" placeholder="Nombre de usuario" label="Nombre de usuario" type="text" error={usernameError} onChange={(e) => setUsername(e.target.value)} defaultValue={username} />
+            <StyledFileInput
+                id="photoInput"
+                placeholder="Foto de perfil"
+                label="Foto de perfil"
+                type="file"
+                error={photoError}
+                value={null}
+                photo={photo}
+                sendPhoto={getPhoto}
+            // style={{ width: `${"540px"}` }}
+            />
+            <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres como mínimo, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
+            <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} />
             <StyledButton label="Registrarme" onClick={() => navigate('/chat')} disabled={!valid} />
             <StyledButton label="Inicio de sesión" onClick={() => navigate('/login')} />
         </RegisterPageContainer>
@@ -66,7 +89,7 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledInput = styled(Input)`
-    min-width: 600px;
+    width: 600px;
 `;
 
 const RegisterPageContainer = styled.div`
@@ -77,4 +100,10 @@ const RegisterPageContainer = styled.div`
     height: 100vh;
 
     background-color: #E2B4BD;
+`;
+
+const getWidth = (photo) => photo ? '480px' : '600px';
+
+const StyledFileInput = styled(Input)`
+    width: ${props => getWidth(props.photo)};   
 `;

@@ -1,22 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { HelpTooltip } from "./HelpTooltip";
 
 export const Input = ({ label, error, help, ...props }) => {
-    return (
-        <InputWrapper>
-            <InputRow>
-                <InputLabel>{label}</InputLabel>
-                {help && (
-                    <HelpTooltip>
-                        {help}
-                    </HelpTooltip>
-                )}
-            </InputRow>
-            <InputContainer {...props} error={error} />
-            {error && <InputError>{error}</InputError>}
-        </InputWrapper>
-    );
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      setPreviewImage(url);
+      sendPhoto(url);
+    } else {
+      setPreviewImage(null);
+    }
+  };
+  function sendPhoto(photo) {
+    props.sendPhoto(photo);
+  }
+
+  return (
+    <InputWrapper>
+      <InputRow>
+        <InputLabel>{label}</InputLabel>
+        {help && (
+          <HelpTooltip>
+            {help}
+          </HelpTooltip>
+        )}
+      </InputRow>
+      <PhotoContainer>
+
+        {props.type === "file" && previewImage && (
+          <InputRow>
+            <PhotoPreview src={previewImage} alt="Foto de perfil" />
+          </InputRow>
+        )
+        }
+        <InputContainer {...props} error={error} onChange={props.type === "file" ? handleFileSelect : ''} />
+      </PhotoContainer>
+      {error && <InputError>{error}</InputError>}
+    </InputWrapper>
+  );
 };
 
 const InputRow = styled.div`
@@ -36,13 +61,18 @@ const InputContainer = styled.input`
   cursor: pointer;
 
   ${({ error }) =>
-        error &&
-        `
+    error &&
+    `
     border: 2px solid red;
   `}
 
   &:focus {
     outline: none;
+  }
+  &:disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
   }
 `;
 
@@ -69,4 +99,12 @@ const InputWrapper = styled.div`
   flex-direction: column;
 `;
 
+const PhotoPreview = styled.img`
+  height: 100px;
+  margin: 10px;
+`;
 
+const PhotoContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
