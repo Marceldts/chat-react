@@ -10,15 +10,17 @@ const ButtonContainer = styled.button`
     margin: 10px;
     border: none;
     border-radius: 5px;
-    background-color: #413C58;
-    color: #E2B4BD;
+    background-color: ${({ disabled }) => disabled ? '#ccc' : '#413C58'};
+    color: ${({ disabled }) => disabled ? '#888' : '#E2B4BD'};
     font-size: 16px;
     font-weight: 600;
-    cursor: pointer;
+    cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
 
     transition: all 0.3s ease;
     transform: scale(1);
     &:hover {
-        transform: scale(1.1);
+        transform: ${({ disabled }) => disabled ? 'none' : 'scale(1.1)'};
+        background-color: ${({ disabled }) => disabled ? '#ccc' : '#524B69'};
+        color: ${({ disabled }) => disabled ? '#888' : '#EFE1E6'};
     }
 `;

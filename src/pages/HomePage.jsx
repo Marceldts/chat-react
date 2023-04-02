@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useLayoutEffect} from "react";
 import styled from "styled-components";
 import { Button } from "../components/Button";
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+
 
 export const HomePage = () => {
     const navigate = useNavigate();
+
+    useLayoutEffect(() => {
+        document.title = 'Inicio';
+       }, []);
     return (
         <HomePageContainer>
             <h1>¡Bienvenido a este chat!</h1>
