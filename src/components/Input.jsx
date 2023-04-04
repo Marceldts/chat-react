@@ -16,6 +16,7 @@ export const Input = ({ label, error, help, ...props }) => {
       sendPhoto('');
     }
   };
+
   function sendPhoto(photo) {
     props.sendPhoto(photo);
   }
@@ -23,7 +24,7 @@ export const Input = ({ label, error, help, ...props }) => {
   return (
     <InputWrapper>
       <InputRow>
-        <InputLabel>{label}</InputLabel>
+        {label && <InputLabel>{label}</InputLabel>}
         {help && (
           <HelpTooltip>
             {help}

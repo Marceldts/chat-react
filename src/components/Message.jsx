@@ -7,7 +7,7 @@ export const Message = ({ children, ...props }) => {
             {!props.own && <SenderPhoto src={props.photo} alt="Foto de perfil del emisor" />}
             <MessageContainer {...props}>
                 <MessageHeader>
-                    <MessageHeaderUser>{props.displayName}</MessageHeaderUser>
+                    {!props.own && <MessageHeaderUser>{props.displayName}</MessageHeaderUser>}
                     <DeleteIcon onClick={props.deleteMessage} />
                 </MessageHeader>
                 {props.type === 'text' && <MessageText>{props.message}</MessageText>}
@@ -32,7 +32,7 @@ const MessageContainer = styled.div`
     max-width: 80%;
     min-width: 30%;
     padding: 10px;
-    margin: 20px;
+    margin: 5px;
     margin-top: 0;
     border-radius: 5px;
     background-color: ${props => props.own ? '#819595' : '#413C58'};
