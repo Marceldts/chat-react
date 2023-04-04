@@ -10,3 +10,7 @@ export const passwordValidator = (password) => {
     return re.test(String(password));
 }
 
+export const photoValidator = (photo) => {
+    const re = /^image\/(png|jpg|jpeg)$/;
+    return photo !== null ? re.test(String(photo.type)) : false;
+}

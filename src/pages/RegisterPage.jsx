@@ -4,7 +4,8 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import { emailValidator, passwordValidator } from "../utils/Validators";
+import { emailValidator, passwordValidator, photoValidator } from "../utils/Validators";
+import { register } from "../utils/firebase-auth";
 
 export const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -26,12 +27,12 @@ export const RegisterPage = () => {
     }, []);
 
     useEffect(() => {
-        console.log(photo)
+        validatePhoto(photo);
     }, [photo]);
 
     useEffect(() => {
-        setValid(emailValidator(email) && passwordValidator(password) && password === confirmedPassword && username !== '');
-    }, [email, password, username]);
+        setValid(emailValidator(email) && passwordValidator(password) && (password === confirmedPassword) && username && photoValidator(photo));
+    }, [email, password, confirmedPassword, username, photo]);
 
     const validateEmail = (value) => {
         setEmail(value);
@@ -56,13 +57,41 @@ export const RegisterPage = () => {
         }
     }
 
+    const validatePhoto = (value) => {
+        if (value === '') {
+            setPhotoError('');
+        } else if (!photoValidator(value)) {
+            setPhotoError('La foto no es válida');
+        } else if (photo.size > 10000000) {
+            setPhotoError('La foto es demasiado grande');
+        } else if (photo.type.startsWith('image/') === false) {
+            setPhotoError('El archivo no es una imagen');
+        } else {
+            setPhotoError('');
+        }
+    }
+
     function getPhoto(photo) {
         setPhoto(photo)
     }
 
+    const onRegister = () => {
+        if (valid) {
+            try {
+                register(email, password, username, photo)
+                    .then(() => {
+                        navigate('/login');
+                    })
+            }
+            catch (error) {
+                alert("Ha habido un error al crear la cuenta");
+            }
+        }
+    }
+
     return (
         <RegisterPageContainer>
-            <h1>¡Bienvenido a este chat!</h1>
+            <h1>Crear una cuenta</h1>
             <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} defaultValue={email} onBlur={(e) => validateEmail(e.target.value)} />
             <StyledInput id="usernameInput" placeholder="Nombre de usuario" label="Nombre de usuario" type="text" error={usernameError} onChange={(e) => setUsername(e.target.value)} defaultValue={username} />
             <StyledFileInput
@@ -71,15 +100,15 @@ export const RegisterPage = () => {
                 label="Foto de perfil"
                 type="file"
                 error={photoError}
-                value={null}
+                defaultValue={null}
                 photo={photo}
                 sendPhoto={getPhoto}
-            // style={{ width: `${"540px"}` }}
+                help="La foto ha de ser de tipo png, jpg o jpeg y no puede pesar más de 10MB"
             />
             <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres como mínimo, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
             <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} />
-            <StyledButton label="Registrarme" onClick={() => navigate('/chat')} disabled={!valid} />
-            <StyledButton label="Inicio de sesión" onClick={() => navigate('/login')} />
+            <StyledButton label="Registrarme" onClick={onRegister} disabled={!valid} />
+            <StyledButton label="Inicio de sesión" onClick={() => navigate("/login")} />
         </RegisterPageContainer>
     );
 };

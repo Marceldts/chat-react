@@ -5,6 +5,7 @@ import { Input } from "../components/Input";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { emailValidator, passwordValidator } from "../utils/Validators";
+import { login } from "../utils/firebase-auth";
 
 export const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -22,19 +23,6 @@ export const LoginPage = () => {
     useEffect(() => {
         setValid(emailValidator(email) && passwordValidator(password));
     }, [email, password]);
-
-    const login = () => {
-        if (emailValidator(email) && passwordValidator(password)) {
-            navigate('/chat');
-        } else {
-            if (!emailValidator(email)) {
-                setEmailError('El correo electrónico no es válido');
-            }
-            if (!passwordValidator(password)) {
-                setPasswordError('La contraseña no es válida');
-            }
-        }
-    }
 
     const validateEmail = (value) => {
         setEmail(value);
@@ -58,13 +46,25 @@ export const LoginPage = () => {
         }
     }
 
+    const onLogin = async () => {
+        login(email, password).then(() => {
+            navigate("/chat");
+        }).catch((error) => {
+            if (error.code === 'auth/user-not-found') {
+                setEmailError('El correo electrónico no está registrado');
+            } else if (error.code === 'auth/wrong-password') {
+                setPasswordError('La contraseña no es válida');
+            }
+        });
+    }
+
     return (
         <LoginPageContainer>
             <h1>Iniciar sesión</h1>
             <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} value={email} onBlur={(e) => validateEmail(e.target.value)} />
             <StyledInput id="passwordInput" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} value={password} onBlur={(e) => validatePassword(e.target.value)} />
-            <StyledButton label="Iniciar sesión" onClick={login} disabled={!valid} />
-            <StyledButton label="Registrarme" onClick={() => navigate('/register')} />
+            <StyledButton label="Iniciar sesión" onClick={onLogin} disabled={!valid} />
+            <StyledButton label="Registrarme" onClick={() => navigate("/register")} />
         </LoginPageContainer>
     );
 };

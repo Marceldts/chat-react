@@ -10,9 +10,10 @@ export const Input = ({ label, error, help, ...props }) => {
     if (file && file.type.startsWith("image/")) {
       const url = URL.createObjectURL(file);
       setPreviewImage(url);
-      sendPhoto(url);
+      sendPhoto(event.target.files[0]);
     } else {
       setPreviewImage(null);
+      sendPhoto('');
     }
   };
   function sendPhoto(photo) {
@@ -33,11 +34,12 @@ export const Input = ({ label, error, help, ...props }) => {
 
         {props.type === "file" && previewImage && (
           <InputRow>
-            <PhotoPreview src={previewImage} alt="Foto de perfil" />
+            <PhotoPreview id="image-preview" src={previewImage} alt="Foto de perfil" />
           </InputRow>
         )
         }
-        <InputContainer {...props} error={error} onChange={props.type === "file" ? handleFileSelect : ''} />
+        {props.type === "file" && <InputContainer {...props} error={error} onChange={handleFileSelect} />}
+        {props.type !== "file" && <InputContainer {...props} error={error} />}
       </PhotoContainer>
       {error && <InputError>{error}</InputError>}
     </InputWrapper>
