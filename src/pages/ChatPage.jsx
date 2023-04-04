@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
 import { useEffect, useState } from "react";
 import { logout } from "../utils/firebase-auth";
+import { getMessagesFromDatabase, addMessageToDatabase } from "../utils/message-service";
 
 import { Button } from "../components/Button";
 import { Toolbar } from "../components/Toolbar";
@@ -26,83 +27,20 @@ export const ChatPage = () => {
     const [photo, setPhoto] = useState('');
 
     const navigate = useNavigate();
+    let messagesArray = [];
 
     useLayoutEffect(() => {
         document.title = 'Chat';
-        setMessages([{
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: false
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: true
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: false
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: true
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: false
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: true
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: false
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: true
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: false
-        }, {
-            message: "Hola, soy un mensaje de prueba",
-            displayName: "Usuario de prueba",
-            photo: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            time: "12:00",
-            type: "text",
-            own: true
-        }])
     }, []);
 
     useEffect(() => {
+        getMessagesFromDatabase().then((messages) => {
+            Object.entries(messages).forEach(([key, value]) => {
+                messagesArray.push(value);
+            });
+            // setMessages(messages);
+            setMessages(messagesArray);
+        });
         const user = JSON.parse(sessionStorage.getItem('user'));
         if (!user) {
             //TO DO: Reemplazar por navigate('/login') cuando tenga bien configurado el auth
@@ -129,6 +67,17 @@ export const ChatPage = () => {
         if (!valid) {
             return;
         }
+        const date = new Date();
+        const time = date.getHours() + ":" + date.getMinutes();
+        const messageObject = {
+            message: message,
+            displayName: "fulanito",
+            photo: "fotichuela",
+            time: time,
+            type: 'text',
+            own: true
+        }
+        addMessageToDatabase(messageObject);
         alert(message)
         setMessage('');
     }
@@ -178,6 +127,7 @@ const ChatPageContainer = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 100vh;
 
     background-color: #E2B4BD;
 `;
@@ -216,7 +166,7 @@ const MessagesContainer = styled.div`
     justify-content: flex-start;
     background-color: #E2B4BD;
     width: 100%;
-    height: 100%;
+    min-height: calc(100vh - 100px);
     padding-top: 50px;
     padding-bottom: 50px;
     `;

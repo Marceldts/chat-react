@@ -1,7 +1,7 @@
 import React from "react";
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import firebaseConfig from "../firebase-config";
+import { firebaseConfig } from "../firebase";
 
 export const app = firebase.initializeApp(firebaseConfig);
 const auth = getAuth(app);

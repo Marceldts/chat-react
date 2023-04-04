@@ -12,7 +12,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { initializeApp } from "firebase/app";
-import firebaseConfig from "./firebase-config";
+import { firebaseConfig } from "./firebase";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,7 +28,6 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  // const app = initializeApp(firebaseConfig);
   return <RouterProvider router={router} />;
 }
 

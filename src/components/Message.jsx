@@ -60,7 +60,6 @@ const SenderPhoto = styled.img`
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
-    margin-left: 20px;
     object-fit: cover;
     object-position: center;
 `;
