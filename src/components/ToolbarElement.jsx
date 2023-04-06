@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 
-//TO DO: Add image sent via props to ToolbarElementContainer. Adjust size and position of element on toolbar.
 export const ToolbarElement = ({ children, ...props }) => {
     return <ToolbarElementContainer {...props} src={props.src} alt={props.alt} valid={props.valid} />;
 }

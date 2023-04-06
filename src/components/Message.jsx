@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getImage } from "../utils/firebase-auth";
+import User from "../assets/User_icon.svg";
+import Delete from "../assets/Delete_icon.svg";
 
 export const Message = ({ children, ...props }) => {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function setImage(email, id) {
+            getImage(email, id);
+            setLoading(false);
+        }
+        setImage(props.email, props.id)
+    }, []);
+
     return (
         <div style={{ display: 'flex', alignItems: 'flex-start', margin: '10px' }}>
-            {!props.own && <SenderPhoto src={props.photo} alt="Foto de perfil del emisor" />}
+            {!props.own && <SenderPhoto src={User} id={props.id} alt="Foto de perfil del emisor" />}
             <MessageContainer {...props}>
-                <MessageHeader>
+                <MessageHeader own={props.own}>
                     {!props.own && <MessageHeaderUser>{props.displayName}</MessageHeaderUser>}
-                    <DeleteIcon onClick={props.deleteMessage} />
+                    {props.own && <DeleteIcon onClick={props.deleteMessage} src={Delete} alt="Borrar mensaje" />}
                 </MessageHeader>
                 {props.type === 'text' && <MessageText>{props.message}</MessageText>}
                 {props.type === 'image' && <MessageImage src={props.message} alt="Imagen enviada" />}
@@ -21,16 +34,16 @@ export const Message = ({ children, ...props }) => {
 const DeleteIcon = styled.img`
     width: 20px;
     height: 20px;
-    margin-right: 10px;
     &:hover {
         cursor: pointer;
     }
-    display: none;
+    visibility: hidden;
 `;
 
 const MessageContainer = styled.div`
     max-width: 80%;
-    min-width: 30%;
+    min-width: 10%;
+    overflow-wrap: break-word;
     padding: 10px;
     margin: 5px;
     margin-top: 0;
@@ -44,15 +57,16 @@ const MessageContainer = styled.div`
 
     &:hover {
         ${DeleteIcon} {
-            display: ${props => props.own ? 'block' : 'none'};
+            visibility: visible;
         }
 `;
 
 const MessageHeader = styled.div`
     display: flex;
+    flex-direction: ${props => props.own ? 'row-reverse' : 'row'};
+    margin-bottom: ${props => props.own ? '0' : '10px'};
     align-items: center;
     width: 100%;
-    margin-bottom: 10px;
 `;
 
 const SenderPhoto = styled.img`

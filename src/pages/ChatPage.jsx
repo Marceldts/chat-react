@@ -4,10 +4,8 @@ import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
 import { useEffect, useState, useRef } from "react";
-import { logout } from "../utils/firebase-auth";
-import { getMessagesFromDatabase, addMessageToDatabase } from "../utils/message-service";
-
-import { Button } from "../components/Button";
+import { login, logout } from "../utils/firebase-auth";
+import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
 import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
 import { Message } from "../components/Message";
@@ -21,10 +19,10 @@ import Camera from "../assets/Camera_icon.svg";
 export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-    const [user, setUser] = useState(null);
     const [valid, setValid] = useState(false);
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || null);
+    const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [photo, setPhoto] = useState('');
 
     const navigate = useNavigate();
     const bottomPageRef = useRef(null);
@@ -33,29 +31,31 @@ export const ChatPage = () => {
     useLayoutEffect(() => {
         document.title = 'Chat';
     }, []);
-
     useEffect(() => {
-        const messagesArray = [];
-        getMessagesFromDatabase().then((messages) => {
-            Object.entries(messages).forEach(([key, value]) => {
-                messagesArray.push(value);
+        const unsubscribe = subscribeToMessages((messages) => {
+            const sortedMessages = messages.sort((a, b) => {
+                return a.ms - b.ms;
             });
-            // setMessages(messages);
-            setMessages(messagesArray);
+            setMessages(sortedMessages);
         });
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        if (!user) {
-            //TO DO: Reemplazar por navigate('/login') cuando tenga bien configurado el auth
-            console.log("Oye chaval si ves este log tienes algo mal porque no existe usuario en session storage")
-        }
-        setUser(user);
+
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
-        if (!user) return;
-        setDisplayName(user.displayName);
-        setPhoto(user.photoURL);
-    }, [user]);
+        if (user) {
+            setDisplayName(user.displayName);
+            setPassword(user.password);
+        }
+    }, [user])
+
+    useEffect(() => {
+        login(user.email, user.password).catch(() => {
+            navigate("/");
+        });
+    }, [password])
 
     useEffect(() => {
         setValid(message !== '');
@@ -80,11 +80,12 @@ export const ChatPage = () => {
         const time = hours + ":" + minutes;
         const messageObject = {
             message: message,
-            displayName: "fulanito",
-            photo: "fotichuela",
+            displayName: displayName,
             time: time,
             type: 'text',
-            author: "ese soy yo"
+            author: user.uid,
+            ms: date.getTime(),
+            email: user.email
         }
         const newMessages = [...messages, messageObject];
         addMessageToDatabase(messageObject);
@@ -108,14 +109,16 @@ export const ChatPage = () => {
             <MessagesContainer >
                 {messages.map((message, index) => {
                     return (
-                        <Message
+                        < Message
                             key={index}
+                            id={index}
+                            email={message.email}
                             message={message.message}
                             displayName={message.displayName}
                             photo={message.photo}
                             time={message.time}
                             type={message.type}
-                            own={message.author === ''}
+                            own={message.author === user.uid}
                         />
                     )
                 })}
@@ -123,7 +126,7 @@ export const ChatPage = () => {
             <FooterToolbar>
                 <StyledToolbarElement src={Camera} alt="Take picture icon" />
                 <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" />
-                <StyledToolbarElement src={Send} alt="Send message icon" onClick={onSend} valid={valid} end />
+                <StyledToolbarElement src={Send} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
             </FooterToolbar>
             <div ref={bottomPageRef} style={{ height: '0px' }} />
         </ChatPageContainer>

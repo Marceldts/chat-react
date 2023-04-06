@@ -5,7 +5,7 @@ import { Input } from "../components/Input";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { emailValidator, passwordValidator, photoValidator } from "../utils/Validators";
-import { register } from "../utils/firebase-auth";
+import { register, login } from "../utils/firebase-auth";
 
 export const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -80,11 +80,14 @@ export const RegisterPage = () => {
             try {
                 register(email, password, username, photo)
                     .then(() => {
-                        navigate('/login');
+                        login(email, password)
+                    })
+                    .then(() => {
+                        navigate('/chat');
                     })
             }
             catch (error) {
-                alert("Ha habido un error al crear la cuenta");
+                alert("Ha habido un error al crear la cuenta. Por favor, vuelve a intentarlo en unos momentos.");
             }
         }
     }
@@ -108,7 +111,7 @@ export const RegisterPage = () => {
             <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres como mínimo, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
             <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} />
             <StyledButton label="Registrarme" onClick={onRegister} disabled={!valid} />
-            <StyledButton label="Inicio de sesión" onClick={() => navigate("/login")} />
+            <StyledButton label="Inicio de sesión" onClick={() => navigate("/chat")} />
         </RegisterPageContainer>
     );
 };
