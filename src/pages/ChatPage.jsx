@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
 import { useEffect, useState, useRef } from "react";
-import { login, logout } from "../utils/firebase-auth";
+import { login, logout, getCurrentUser } from "../utils/firebase-auth";
 import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
 import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
@@ -21,8 +21,7 @@ export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [valid, setValid] = useState(false);
-    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || null);
-    const [password, setPassword] = useState('');
+    const [user, setUser] = useState(null);
     const [displayName, setDisplayName] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -33,6 +32,19 @@ export const ChatPage = () => {
     useLayoutEffect(() => {
         document.title = 'Chat';
     }, []);
+
+    useEffect(() => {
+        const getUser = async () => {
+            getCurrentUser().then((user) => {
+                setUser(user);
+                if (!user) {
+                    navigate('/');
+                }
+            })
+        }
+        getUser()
+    }, [])
+
     useEffect(() => {
         const unsubscribe = subscribeToMessages((subscribedMessages) => {
             let sortedMessages = subscribedMessages.sort((a, b) => {
@@ -51,15 +63,8 @@ export const ChatPage = () => {
     useEffect(() => {
         if (user) {
             setDisplayName(user.displayName);
-            setPassword(user.password);
         }
-    }, [user])
-
-    useEffect(() => {
-        login(user.email, user.password).catch(() => {
-            navigate("/");
-        });
-    }, [password])
+    }, [user]);
 
     useEffect(() => {
         setValid(message !== '');

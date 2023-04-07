@@ -1,6 +1,6 @@
 import React from "react";
 import firebase from 'firebase/compat/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase";
@@ -19,7 +19,6 @@ export const login = async (email, password) => {
             sessionStorage.setItem('user', JSON.stringify({
                 email: user.email,
                 displayName: user.displayName,
-                photoURL: user.photoURL,
                 password: password,
                 uid: user.uid
             })
@@ -27,6 +26,19 @@ export const login = async (email, password) => {
         })
     return user;
 }
+
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            if (user) {
+                resolve(user);
+            } else {
+                resolve(null);
+            }
+        }, reject);
+    });
+};
 
 const saveUserDB = async (email, displayName, photoURL, password, uid) => {
     const path = `profilePhotos/${email}.jpg`;
@@ -50,16 +62,15 @@ export const getImage = async (email, id) => {
 }
 
 
-export const register = async (email, password, username, photo) => {
+export const register = async (email, password, displayName, photo) => {
     const userCreated = await createUserWithEmailAndPassword(auth, email, password)
         .then((userData) => {
             const { user } = userData;
-            setUserData(username, URL.createObjectURL(photo));
-            saveUserDB(email, username, photo, password, user.uid);
+            setUserData(displayName, URL.createObjectURL(photo));
+            saveUserDB(email, displayName, photo, password, user.uid);
             sessionStorage.setItem('user', JSON.stringify({
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: URL.createObjectURL(photo),
+                email: email,
+                displayName: displayName,
                 password: password,
                 uid: user.uid
             }));
