@@ -9,13 +9,14 @@ import { addMessageToDatabase, subscribeToMessages } from "../utils/message-serv
 import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
 import { Message } from "../components/Message";
+import { Spinner } from "../components/Spinner";
 
 import Hamburger from "../assets/Hamburger_icon.svg";
 import Logout from "../assets/Logout_icon.svg";
 import Send from "../assets/Send_icon.svg";
 import Camera from "../assets/Camera_icon.svg";
 
-
+//TO DO: Add loader when loading messages, add camera functionality, add menu functionality
 export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -23,6 +24,7 @@ export const ChatPage = () => {
     const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || null);
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
     const bottomPageRef = useRef(null);
@@ -32,11 +34,13 @@ export const ChatPage = () => {
         document.title = 'Chat';
     }, []);
     useEffect(() => {
-        const unsubscribe = subscribeToMessages((messages) => {
-            const sortedMessages = messages.sort((a, b) => {
+        const unsubscribe = subscribeToMessages((subscribedMessages) => {
+            let sortedMessages = subscribedMessages.sort((a, b) => {
                 return a.ms - b.ms;
             });
-            setMessages(sortedMessages);
+            const newMessages = [...messages, ...sortedMessages];
+            setMessages(newMessages);
+            setLoading(false);
         });
 
         return () => {
@@ -101,6 +105,7 @@ export const ChatPage = () => {
     }
     return (
         <ChatPageContainer>
+            {loading && <Spinner></Spinner>}
             <HeaderToolbar>
                 <ToolbarElement id="hamburger-menu" src={Hamburger} alt="Hamburger menu icon" onClick={onMenuClicked} />
                 <h2>Chat</h2>
@@ -168,7 +173,7 @@ const FooterToolbar = styled(Toolbar)`
 
 const StyledToolbarElement = styled(ToolbarElement)`
     height: 30px;
-    margin-right: ${props => props.end ? '20px' : '0px'};
+    margin-right: ${props => props.end ? '20px' : '5px'};
     &:hover {
         cursor: ${props => props.valid === true ? 'pointer' : 'not-allowed'};
     }

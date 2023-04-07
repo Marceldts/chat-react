@@ -1,4 +1,4 @@
-import { collection, addDoc, onSnapshot, getDocs } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { app, db } from "../firebase";
 
 export const messagesCollection = collection(db, "messages");
@@ -13,7 +13,8 @@ export const getMessagesFromDatabase = async () => {
 };
 
 export const subscribeToMessages = (callback) => {
-    return onSnapshot(messagesCollection, (querySnapshot) => {
+    const q = query(messagesCollection, orderBy("ms", "desc"), limit(20));
+    return onSnapshot(q, (querySnapshot) => {
         const messages = [];
         querySnapshot.forEach((doc) => {
             messages.push({ id: doc.id, ...doc.data() });
