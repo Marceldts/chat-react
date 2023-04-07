@@ -22,6 +22,11 @@ const SpinnerContainer = styled.div`
     top: 40%;
     z-index: 100;
     background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    @media (max-width: 768px) {
+        height: 150px;
+        width: 150px;
+    }
 `;
 
 

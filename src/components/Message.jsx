@@ -16,7 +16,7 @@ export const Message = ({ children, ...props }) => {
     }, []);
 
     return (
-        <div style={{ display: 'flex', alignItems: 'flex-start', margin: '10px' }}>
+        <MessageWrapper>
             {!props.own && <SenderPhoto src={User} id={props.id} alt="Foto de perfil del emisor" />}
             <MessageContainer {...props}>
                 <MessageHeader own={props.own}>
@@ -27,7 +27,7 @@ export const Message = ({ children, ...props }) => {
                 {props.type === 'image' && <MessageImage src={props.message} alt="Imagen enviada" />}
                 <MessageHeaderTime>{props.time}</MessageHeaderTime>
             </MessageContainer>
-        </div>
+        </MessageWrapper>
     );
 }
 
@@ -59,6 +59,10 @@ const MessageContainer = styled.div`
         ${DeleteIcon} {
             visibility: visible;
         }
+    }
+    @media (max-width: 768px) {
+        max-width: 75%;
+    }
 `;
 
 const MessageHeader = styled.div`
@@ -81,7 +85,11 @@ const SenderPhoto = styled.img`
 const MessageHeaderUser = styled.h3`
     margin: 0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: bold;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+    }
 `;
 
 const MessageHeaderTime = styled.span`
@@ -90,13 +98,30 @@ const MessageHeaderTime = styled.span`
     padding-top: 5px;
     display: flex;
     justify-content: flex-end;
+
+    @media (max-width: 768px) {
+        font-size: 11px;
+    }
 `;
 
 const MessageText = styled.p`
+    font-weight: 500;
     margin: 0;
+    font-size: 16px;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+    }
 `;
 
 const MessageImage = styled.img`
     width: 100%;
     border-radius: 2px;
+`;
+
+const MessageWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 10px;
 `;

@@ -74,6 +74,10 @@ const StyledButton = styled(Button)`
 `;
 const StyledInput = styled(Input)`
     min-width: 600px;
+    @media (max-width: 768px) {
+      min-width: 300px;
+      font-size: 14px;
+    }
 `;
 
 const LoginPageContainer = styled.div`
@@ -81,7 +85,7 @@ const LoginPageContainer = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
 
     background-color: #E2B4BD;
 `;

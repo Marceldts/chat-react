@@ -54,7 +54,7 @@ const InputRow = styled.div`
 
 const InputContainer = styled.input`
   padding: 10px 20px;
-  margin: 10px;
+  margin: ${props => !props.error ? "10px" : "10px 10px 0 10px"};
   border: none;
   border-radius: 5px;
   background-color: #ffffff;
@@ -83,6 +83,9 @@ const InputLabel = styled.label`
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 5px;
+  @media (max-width: 768px) {
+    margin-left: 10px;
+  }
 `;
 
 const InputError = styled.span`
@@ -90,6 +93,9 @@ const InputError = styled.span`
   font-size: 14px;
   font-weight: 600;
   margin-top: 5px;
+  @media (max-width: 768px) {
+    margin-left: 10px;
+  }
 `;
 
 const InputHelp = styled.span`
@@ -100,6 +106,9 @@ const InputHelp = styled.span`
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const PhotoPreview = styled.img`
