@@ -16,7 +16,7 @@ import Logout from "../assets/Logout_icon.svg";
 import Send from "../assets/Send_icon.svg";
 import Camera from "../assets/Camera_icon.svg";
 
-//TO DO: Add loader when loading messages, add camera functionality, add menu functionality
+//TO DO: Add camera functionality, add menu functionality
 export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -135,7 +135,11 @@ export const ChatPage = () => {
             </MessagesContainer>
             <FooterToolbar>
                 <StyledToolbarElement src={Camera} alt="Take picture icon" />
-                <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" />
+                <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => {
+                    if (e.key === 'Enter' && valid) {
+                        onSend();
+                    }
+                }} />
                 <StyledToolbarElement src={Send} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
             </FooterToolbar>
             <div ref={bottomPageRef} style={{ height: '0px' }} />
