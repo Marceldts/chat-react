@@ -108,7 +108,7 @@ export const RegisterPage = () => {
                 sendPhoto={getPhoto}
                 help={`La foto ha de ser de tipo png, jpg o jpeg y no puede pesar más de 10MB. La foto actual pesa ${photo ? (photo.size / 1000000).toFixed(2) : 0}MB. La foto ha de ser cuadrada para que se vea correctamente`}
             />
-            <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres como mínimo, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
+            <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
             <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} />
             <StyledButton label="Registrarme" onClick={onRegister} disabled={!valid} />
             <StyledButton label="Inicio de sesión" onClick={() => navigate("/chat")} />
