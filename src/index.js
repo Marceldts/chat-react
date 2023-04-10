@@ -6,8 +6,11 @@ import reportWebVitals from "./reportWebVitals";
 import { FirebaseAppProvider } from "reactfire";
 import { firebaseConfig } from "./firebase";
 import { Suspense } from "react";
+import { defineCustomElements } from "@ionic/pwa-elements/loader";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+defineCustomElements(window);
+
 root.render(
   <FirebaseAppProvider firebaseConfig={firebaseConfig}>
     <Suspense fallback={"Conectando..."}>

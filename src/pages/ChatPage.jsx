@@ -4,19 +4,21 @@ import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
 import { useEffect, useState, useRef } from "react";
+import { Camera, CameraResultType } from "@capacitor/camera";
 import { login, logout, getCurrentUser } from "../utils/firebase-auth";
 import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
+
 import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
 import { Message } from "../components/Message";
 import { Spinner } from "../components/Spinner";
 
-import Hamburger from "../assets/Hamburger_icon.svg";
-import Logout from "../assets/Logout_icon.svg";
-import Send from "../assets/Send_icon.svg";
-import Camera from "../assets/Camera_icon.svg";
+import Hamburger_icon from "../assets/Hamburger_icon.svg";
+import Logout_icon from "../assets/Logout_icon.svg";
+import Send_icon from "../assets/Send_icon.svg";
+import Camera_icon from "../assets/Camera_icon.svg";
 
-//TO DO: Add camera functionality, add menu functionality
+//TO DO: Fix android logo, add  menu functionality
 export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -79,42 +81,71 @@ export const ChatPage = () => {
         alert("Hola");
     }
 
-    const onSend = () => {
-        if (!valid) {
+    const onTakePicture = async () => {
+        try {
+            const image = await Camera.getPhoto({
+                quality: 90,
+                allowEditing: true,
+                resultType: CameraResultType.Uri,
+                saveToGallery: true,
+            });
+            const src = image.webPath;
+            onSend(src);
+        } catch (error) {
+        }
+    };
+
+    const onSend = (src) => {
+        if (!valid && !src) {
             return;
         }
         const date = new Date();
         const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
         const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
         const time = hours + ":" + minutes;
-        const messageObject = {
-            message: message,
-            displayName: displayName,
-            time: time,
-            type: 'text',
-            author: user.uid,
-            ms: date.getTime(),
-            email: user.email
+        let messageObject;
+        console.log(src)
+        if (!src) {
+            messageObject = {
+                message: message,
+                displayName: displayName,
+                time: time,
+                type: 'text',
+                author: user.uid,
+                ms: date.getTime(),
+                email: user.email
+            }
+        } else {
+            messageObject = {
+                message: src,
+                displayName: displayName,
+                time: time,
+                type: 'image',
+                author: user.uid,
+                ms: date.getTime(),
+                email: user.email
+            }
         }
         const newMessages = [...messages, messageObject];
         addMessageToDatabase(messageObject);
         setMessages(newMessages);
         setMessage('');
-    }
+    };
 
     const onLogout = () => {
         if (!window.confirm("¿Estás seguro que quieres cerrar sesión?")) {
             return;
         }
         logout().then(() => navigate('/'));
-    }
+    };
+
     return (
         <ChatPageContainer>
             {loading && <Spinner></Spinner>}
             <HeaderToolbar>
-                <ToolbarElement id="hamburger-menu" src={Hamburger} alt="Hamburger menu icon" onClick={onMenuClicked} />
+                <ToolbarElement id="hamburger-menu" src={Hamburger_icon} alt="Hamburger menu icon" onClick={onMenuClicked} />
                 <h2>Chat</h2>
-                <ToolbarElement id="logout" src={Logout} alt="Logout icon" onClick={onLogout} />
+                <ToolbarElement id="logout" src={Logout_icon} alt="Logout icon" onClick={onLogout} />
             </HeaderToolbar>
             <MessagesContainer >
                 {messages.map((message, index) => {
@@ -134,13 +165,13 @@ export const ChatPage = () => {
                 })}
             </MessagesContainer>
             <FooterToolbar>
-                <StyledToolbarElement src={Camera} alt="Take picture icon" />
+                <StyledToolbarElement src={Camera_icon} onClick={onTakePicture} alt="Take picture icon" valid={true} />
                 <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => {
                     if (e.key === 'Enter' && valid) {
                         onSend();
                     }
                 }} />
-                <StyledToolbarElement src={Send} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
+                <StyledToolbarElement src={Send_icon} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
             </FooterToolbar>
             <div ref={bottomPageRef} style={{ height: '0px' }} />
         </ChatPageContainer>
