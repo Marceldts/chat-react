@@ -1,9 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { HelpTooltip } from "./HelpTooltip";
+import EyeClosed from "../assets/Eye_closed_icon.svg";
+import EyeOpened from "../assets/Eye_opened_icon.svg";
 
 export const Input = ({ label, error, help, ...props }) => {
   const [previewImage, setPreviewImage] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [initialType, setInitialType] = useState(props.type);
+  const input = document.getElementById(props.id) || {};
+
+  useEffect(() => {
+    if (input.disabled) {
+      setShowPassword(false);
+      input.type = "password";
+      return;
+    };
+    showPassword ? input.type = "text" : input.type = "password";
+  }, [showPassword]);
+
+  useEffect(() => {
+    if (input.disabled && initialType === "password") {
+      setShowPassword(false);
+      input.type = "password";
+    }
+  }, [input.disabled]);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -32,7 +53,6 @@ export const Input = ({ label, error, help, ...props }) => {
         )}
       </InputRow>
       <PhotoContainer>
-
         {props.type === "file" && previewImage && (
           <InputRow>
             <PhotoPreview id="image-preview" src={previewImage} alt="Foto de perfil" />
@@ -41,6 +61,9 @@ export const Input = ({ label, error, help, ...props }) => {
         }
         {props.type === "file" && <InputContainer {...props} error={error} onChange={handleFileSelect} />}
         {props.type !== "file" && <InputContainer {...props} error={error} />}
+        {props.type === "password" && (
+          <EyeIcon src={showPassword ? EyeOpened : EyeClosed} onClick={() => setShowPassword(!showPassword)} />
+        )}
       </PhotoContainer>
       {error && <InputError>{error}</InputError>}
     </InputWrapper>
@@ -52,6 +75,7 @@ const InputRow = styled.div`
     flex-direction: row;
     `;
 
+//Hacemos el ::-ms-reveal y ::-ms-clear transparentes para que no se vean los botones de mostrar y ocultar contraseña en IE y Edge
 const InputContainer = styled.input`
   padding: 10px 20px;
   margin: ${props => !props.error ? "10px" : "10px 10px 0 10px"};
@@ -62,6 +86,11 @@ const InputContainer = styled.input`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+
+  ::-ms-reveal,
+  ::-ms-clear {
+    display: none;
+  }
 
   ${({ error }) =>
     error &&
@@ -121,4 +150,14 @@ const PhotoPreview = styled.img`
 const PhotoContainer = styled.div`
   display: flex;
   flex-direction: row;
+  position: relative;
+`;
+
+const EyeIcon = styled.img`
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 25px;
 `;

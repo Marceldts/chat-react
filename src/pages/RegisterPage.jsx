@@ -138,4 +138,5 @@ const getWidth = (photo) => photo ? '480px' : '600px';
 
 const StyledFileInput = styled(Input)`
     width: ${props => getWidth(props.photo)};   
+    object-fit: contain;
 `;
