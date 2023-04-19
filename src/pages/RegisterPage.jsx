@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { emailValidator, passwordValidator, photoValidator } from "../utils/Validators";
 import { register, login } from "../utils/firebase-auth";
+import { onEnter } from "../utils/enter-service";
 
 export const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -76,27 +77,26 @@ export const RegisterPage = () => {
     }
 
     const onRegister = () => {
-        if (valid) {
-            try {
-                register(email, password, username, photo)
-                    .then(() => {
-                        login(email, password)
-                    })
-                    .then(() => {
-                        navigate('/chat');
-                    })
-            }
-            catch (error) {
-                alert("Ha habido un error al crear la cuenta. Por favor, vuelve a intentarlo en unos momentos.");
-            }
+        if (!valid) return;
+        try {
+            register(email, password, username, photo)
+                .then(() => {
+                    login(email, password)
+                })
+                .then(() => {
+                    navigate('/chat');
+                })
+        }
+        catch (error) {
+            alert("Ha habido un error al crear la cuenta. Por favor, vuelve a intentarlo en unos momentos.");
         }
     }
 
     return (
         <RegisterPageContainer>
             <h1>Crear una cuenta</h1>
-            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} defaultValue={email} onBlur={(e) => validateEmail(e.target.value)} />
-            <StyledInput id="usernameInput" placeholder="Nombre de usuario" label="Nombre de usuario" type="text" error={usernameError} onChange={(e) => setUsername(e.target.value)} defaultValue={username} />
+            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} defaultValue={email} onBlur={(e) => validateEmail(e.target.value)} onKeyDown={(e) => onEnter(e, onRegister)} />
+            <StyledInput id="usernameInput" placeholder="Nombre de usuario" label="Nombre de usuario" type="text" error={usernameError} onChange={(e) => setUsername(e.target.value)} defaultValue={username} onKeyDown={(e) => onEnter(e, onRegister)} />
             <StyledFileInput
                 id="photoInput"
                 placeholder="Foto de perfil"
@@ -108,10 +108,10 @@ export const RegisterPage = () => {
                 sendPhoto={getPhoto}
                 help={`La foto ha de ser de tipo png, jpg o jpeg y no puede pesar más de 10MB. La foto actual pesa ${photo ? (photo.size / 1000000).toFixed(2) : 0}MB. La foto ha de ser cuadrada para que se vea correctamente`}
             />
-            <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} />
-            <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} />
+            <StyledInput id="passwordInput" help="La contraseña ha de tener 6 carácteres, así como 1 mayúscula, 1 minúscula y 1 número (como mínimo)" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} defaultValue={password} onBlur={(e) => validatePassword(e.target.value)} onKeyDown={(e) => onEnter(e, onRegister)} />
+            <StyledInput id="confirmedPasswordInput" placeholder="Confirmar contraseña" label="Confirmar contraseña" type="password" error={passwordError} onChange={(e) => setConfirmedPassword(e.target.value)} defaultValue={confirmedPassword} onBlur={(e) => validatePassword(e.target.value)} disabled={password === ''} onKeyDown={(e) => onEnter(e, onRegister)} />
             <StyledButton label="Registrarme" onClick={onRegister} disabled={!valid} />
-            <StyledButton label="Inicio de sesión" onClick={() => navigate("/chat")} />
+            <StyledButton label="Inicio de sesión" onClick={() => navigate("/login")} />
         </RegisterPageContainer>
     );
 };

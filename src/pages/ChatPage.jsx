@@ -7,6 +7,7 @@ import { useEffect, useState, useRef } from "react";
 import { Camera, CameraResultType } from "@capacitor/camera";
 import { login, logout, getCurrentUser } from "../utils/firebase-auth";
 import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
+import { onEnter } from "../utils/enter-service";
 
 import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
@@ -104,7 +105,6 @@ export const ChatPage = () => {
         const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
         const time = hours + ":" + minutes;
         let messageObject;
-        console.log(src)
         if (!src) {
             messageObject = {
                 message: message,
@@ -166,11 +166,7 @@ export const ChatPage = () => {
             </MessagesContainer>
             <FooterToolbar>
                 <StyledToolbarElement src={Camera_icon} onClick={onTakePicture} alt="Take picture icon" valid={true} />
-                <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => {
-                    if (e.key === 'Enter' && valid) {
-                        onSend();
-                    }
-                }} />
+                <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => onEnter(e, onSend)} />
                 <StyledToolbarElement src={Send_icon} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
             </FooterToolbar>
             <div ref={bottomPageRef} style={{ height: '0px' }} />
