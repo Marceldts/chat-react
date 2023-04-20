@@ -78,6 +78,15 @@ export const register = async (email, password, displayName, photo) => {
     return userCreated;
 }
 
+export const uploadTakenPhoto = async (photo) => {
+    const date = new Date();
+    const path = `messages/${auth.currentUser.email}+${date.getTime()}.png`;
+    const photoRef = ref(storage, path);
+    const uploadPhoto = await uploadBytes(photoRef, photo);
+    const url = await getDownloadURL(photoRef);
+    return url;
+}
+
 export const setUserData = async (displayName, photo) => {
     const user = await updateProfile(auth.currentUser, {
         displayName: displayName,

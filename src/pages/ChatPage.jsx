@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
 import { useEffect, useState, useRef } from "react";
 import { Camera, CameraResultType } from "@capacitor/camera";
-import { login, logout, getCurrentUser } from "../utils/firebase-auth";
+import { logout, getCurrentUser, uploadTakenPhoto } from "../utils/firebase-auth";
 import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
 import { onEnter } from "../utils/enter-service";
 
@@ -82,6 +82,7 @@ export const ChatPage = () => {
         alert("Hola");
     }
 
+    //We fetch the image and convert it to a blob to upload it to firebase storage
     const onTakePicture = async () => {
         try {
             const image = await Camera.getPhoto({
@@ -90,8 +91,15 @@ export const ChatPage = () => {
                 resultType: CameraResultType.Uri,
                 saveToGallery: true,
             });
-            const src = image.webPath;
-            onSend(src);
+            const file = await fetch(image.webPath);
+            const blob = await file.blob();
+
+            const src = image.path;
+            uploadTakenPhoto(blob).then((url) => {
+                onSend(url);
+            });
+            console.log("blob", blob)
+            console.log("file", file)
         } catch (error) {
         }
     };

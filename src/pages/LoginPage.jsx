@@ -62,8 +62,8 @@ export const LoginPage = () => {
     return (
         <LoginPageContainer>
             <h1>Iniciar sesión</h1>
-            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} value={email} onBlur={(e) => validateEmail(e.target.value)} onKeyDown={(e) => onEnter(e, login)} />
-            <StyledInput id="passwordInput" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} value={password} onBlur={(e) => validatePassword(e.target.value)} onKeyDown={(e) => onEnter(e, login)} />
+            <StyledInput id="emailInput" placeholder="Correo electrónico" label="Email" type="email" error={emailError} onChange={(e) => setEmail(e.target.value)} value={email} onBlur={(e) => validateEmail(e.target.value)} onKeyDown={(e) => onEnter(e, onLogin)} />
+            <StyledInput id="passwordInput" placeholder="Contraseña" label="Contraseña" type="password" error={passwordError} onChange={(e) => setPassword(e.target.value)} value={password} onBlur={(e) => validatePassword(e.target.value)} onKeyDown={(e) => onEnter(e, onLogin)} />
             <StyledButton label="Iniciar sesión" onClick={onLogin} disabled={!valid} />
             <StyledButton label="Registrarme" onClick={() => navigate("/register")} />
         </LoginPageContainer>
