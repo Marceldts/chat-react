@@ -127,11 +127,6 @@ const InputError = styled.span`
   }
 `;
 
-const InputHelp = styled.span`
-  font-size: 14px;
-  margin-top: 5px;
-`;
-
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;

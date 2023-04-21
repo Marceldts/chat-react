@@ -9,7 +9,7 @@ const HelpContainer = styled.div`
 
 const HelpIcon = styled.div`
   display: inline-flex;
-  align-items: top;
+  align-items: center;
   justify-content: center;
   width: 18px;
   height: 18px;
@@ -25,7 +25,7 @@ const HelpIcon = styled.div`
 const HelpTooltipContainer = styled.div`
   position: absolute;
   top: 100%; 
-  left: 50%; 
+  left: 50%;
   transform: translateX(-50%); 
   padding: 8px;
   border-radius: 8px;
@@ -34,6 +34,10 @@ const HelpTooltipContainer = styled.div`
   z-index: 1;
   width: max-content;
   max-width: 300px;
+
+  @media (max-width: 768px) {
+    transform: translateX(-30%);
+  }
 `;
 
 const HelpTooltipText = styled.div`
