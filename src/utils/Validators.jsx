@@ -6,7 +6,7 @@ export const emailValidator = (email) => {
 }
 
 export const passwordValidator = (password) => {
-    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
     return re.test(String(password));
 }
 
