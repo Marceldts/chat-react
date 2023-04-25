@@ -211,8 +211,6 @@ const ChatPageContainer = styled.div`
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-
-    background-color: #E2B4BD;
 `;
 
 const HeaderToolbar = styled(Toolbar)`

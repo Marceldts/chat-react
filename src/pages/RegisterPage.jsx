@@ -130,8 +130,6 @@ const RegisterPageContainer = styled.div`
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-
-    background-color: #E2B4BD;
 `;
 
 const getWidth = (photo) => photo ? '480px' : '600px';

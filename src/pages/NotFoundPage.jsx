@@ -35,6 +35,4 @@ const NotFoundPageContainer = styled.div`
     @media (max-width: 768px) {
         padding: 0 20px;
     }
-
-    background-color: #E2B4BD;
 `;
