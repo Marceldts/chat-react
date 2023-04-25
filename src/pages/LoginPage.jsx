@@ -76,7 +76,7 @@ const StyledButton = styled(Button)`
 const StyledInput = styled(Input)`
     min-width: 600px;
     @media (max-width: 768px) {
-      min-width: 300px;
+      min-width: 315px;
       font-size: 14px;
     }
 `;

@@ -154,5 +154,5 @@ const EyeIcon = styled.img`
   cursor: pointer;
   position: absolute;
   top: 20px;
-  right: 25px;
+  right: 30px;
 `;

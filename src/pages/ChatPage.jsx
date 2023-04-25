@@ -1,9 +1,8 @@
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { useNavigate } from 'react-router-dom';
 import { ToolbarElement } from "../components/ToolbarElement";
-import { useEffect, useState, useRef } from "react";
 import { Camera, CameraResultType } from "@capacitor/camera";
 import { logout, getCurrentUser, uploadTakenPhoto } from "../utils/firebase-auth";
 import { addMessageToDatabase, subscribeToMessages } from "../utils/message-service";
@@ -13,6 +12,7 @@ import { Toolbar } from "../components/Toolbar";
 import { Input } from "../components/Input";
 import { Message } from "../components/Message";
 import { Spinner } from "../components/Spinner";
+import { SideMenu } from "../components/side-menu/SideMenu";
 
 import Hamburger_icon from "../assets/Hamburger_icon.svg";
 import Logout_icon from "../assets/Logout_icon.svg";
@@ -27,9 +27,11 @@ export const ChatPage = () => {
     const [user, setUser] = useState(null);
     const [displayName, setDisplayName] = useState('');
     const [loading, setLoading] = useState(true);
+    const [sideMenuOpen, setSideMenuOpen] = useState(false);
 
     const navigate = useNavigate();
     const bottomPageRef = useRef(null);
+    const chatPageRef = useRef(null);
 
 
     useLayoutEffect(() => {
@@ -64,6 +66,23 @@ export const ChatPage = () => {
     }, []);
 
     useEffect(() => {
+        const sideMenu = document.getElementById("side-menu");
+        const handleOutsideClick = (event) => {
+            if (sideMenuOpen && chatPageRef.current && (!sideMenu.contains(event.target) && event.target !== document.getElementById("hamburger-menu"))) {
+                setSideMenuOpen(false);
+            }
+        };
+
+        if (sideMenuOpen) {
+            document.addEventListener('click', handleOutsideClick);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleOutsideClick);
+        };
+    }, [sideMenuOpen]);
+
+    useEffect(() => {
         if (user) {
             setDisplayName(user.displayName);
         }
@@ -79,8 +98,8 @@ export const ChatPage = () => {
     }, [messages]);
 
     const onMenuClicked = () => {
-        alert("Hola");
-    }
+        setSideMenuOpen(true);
+    };
 
     //We fetch the image and convert it to a blob to upload it to firebase storage
     const onTakePicture = async () => {
@@ -91,6 +110,7 @@ export const ChatPage = () => {
                 resultType: CameraResultType.Uri,
                 saveToGallery: true,
             });
+
             const file = await fetch(image.webPath);
             const blob = await file.blob();
 
@@ -98,8 +118,6 @@ export const ChatPage = () => {
             uploadTakenPhoto(blob).then((url) => {
                 onSend(url);
             });
-            console.log("blob", blob)
-            console.log("file", file)
         } catch (error) {
         }
     };
@@ -148,37 +166,40 @@ export const ChatPage = () => {
     };
 
     return (
-        <ChatPageContainer>
-            {loading && <Spinner></Spinner>}
-            <HeaderToolbar>
-                <ToolbarElement id="hamburger-menu" src={Hamburger_icon} alt="Hamburger menu icon" onClick={onMenuClicked} />
-                <h2>Chat</h2>
-                <ToolbarElement id="logout" src={Logout_icon} alt="Logout icon" onClick={onLogout} />
-            </HeaderToolbar>
-            <MessagesContainer >
-                {messages.map((message, index) => {
-                    return (
-                        < Message
-                            key={index}
-                            id={index}
-                            email={message.email}
-                            message={message.message}
-                            displayName={message.displayName}
-                            photo={message.photo}
-                            time={message.time}
-                            type={message.type}
-                            own={message.author === user.uid}
-                        />
-                    )
-                })}
-            </MessagesContainer>
-            <FooterToolbar>
-                <StyledToolbarElement src={Camera_icon} onClick={onTakePicture} alt="Take picture icon" valid={true} />
-                <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => onEnter(e, onSend)} />
-                <StyledToolbarElement src={Send_icon} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
-            </FooterToolbar>
-            <div ref={bottomPageRef} style={{ height: '0px' }} />
-        </ChatPageContainer>
+        <div ref={chatPageRef}>
+            <ChatPageContainer>
+                {loading && <Spinner></Spinner>}
+                <HeaderToolbar>
+                    <ToolbarElement id="hamburger-menu" src={Hamburger_icon} alt="Hamburger menu icon" onClick={onMenuClicked} />
+                    <h2>Chat</h2>
+                    <ToolbarElement id="logout" src={Logout_icon} alt="Logout icon" onClick={onLogout} />
+                </HeaderToolbar>
+                {sideMenuOpen && <SideMenu id="side-menu" items={[{ method: onlanguagechange, icon: Hamburger_icon, text: "Holaa" }, { method: onlanguagechange, icon: Hamburger_icon, text: "Adios" }]} open={sideMenuOpen} />}
+                <MessagesContainer >
+                    {messages.map((message, index) => {
+                        return (
+                            < Message
+                                key={index}
+                                id={index}
+                                email={message.email}
+                                message={message.message}
+                                displayName={message.displayName}
+                                photo={message.photo}
+                                time={message.time}
+                                type={message.type}
+                                own={message.author === user.uid}
+                            />
+                        )
+                    })}
+                </MessagesContainer>
+                <FooterToolbar>
+                    <StyledToolbarElement src={Camera_icon} onClick={onTakePicture} alt="Take picture icon" valid={true} />
+                    <StyledInput placeholder="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} autoComplete="new-password" onKeyDown={(e) => onEnter(e, onSend)} />
+                    <StyledToolbarElement src={Send_icon} alt="Send message icon" onClick={onSend} valid={valid} end="true" />
+                </FooterToolbar>
+                <div ref={bottomPageRef} style={{ height: '0px' }} />
+            </ChatPageContainer>
+        </div>
     );
 
     // We use auto-complete="new-password" to avoid that the browser suggests the last message sent (edge stills suggests it with autocomplete="off")
