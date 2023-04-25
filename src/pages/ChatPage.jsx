@@ -188,6 +188,7 @@ export const ChatPage = () => {
                                 time={message.time}
                                 type={message.type}
                                 own={message.author === user.uid}
+                                ms={message.ms}
                             />
                         )
                     })}

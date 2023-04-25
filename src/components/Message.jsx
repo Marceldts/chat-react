@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getImage } from "../utils/firebase-auth";
+
 import User from "../assets/User_icon.svg";
 import Delete from "../assets/Delete_icon.svg";
 
+import { getImage } from "../utils/firebase-auth";
+import { deleteMessageFromDatabase } from "../utils/message-service";
+
 export const Message = ({ children, ...props }) => {
     const [loading, setLoading] = useState(true);
+    const [deleted, setDeleted] = useState(false);
 
     useEffect(() => {
         async function setImage(email, id) {
@@ -15,19 +19,27 @@ export const Message = ({ children, ...props }) => {
         setImage(props.email, props.id)
     }, []);
 
+    const deleteMessage = () => {
+        deleteMessageFromDatabase(props.ms, props.email).then(() => {
+            setDeleted(true);
+        });
+    }
+
     return (
-        <MessageWrapper>
-            {!props.own && <SenderPhoto src={User} id={props.id} alt="Foto de perfil del emisor" />}
-            <MessageContainer {...props}>
-                <MessageHeader own={props.own}>
-                    {!props.own && <MessageHeaderUser>{props.displayName}</MessageHeaderUser>}
-                    {props.own && <DeleteIcon onClick={props.deleteMessage} src={Delete} alt="Borrar mensaje" />}
-                </MessageHeader>
-                {props.type === 'text' && <MessageText>{props.message}</MessageText>}
-                {props.type === 'image' && <MessageImage src={props.message} alt="Imagen enviada" />}
-                <MessageHeaderTime>{props.time}</MessageHeaderTime>
-            </MessageContainer>
-        </MessageWrapper>
+        <>
+            {!deleted && <MessageWrapper>
+                {!props.own && <SenderPhoto src={User} id={props.id} alt="Foto de perfil del emisor" />}
+                <MessageContainer {...props}>
+                    <MessageHeader own={props.own}>
+                        {!props.own && <MessageHeaderUser>{props.displayName}</MessageHeaderUser>}
+                        {props.own && <DeleteIcon onClick={deleteMessage} src={Delete} alt="Borrar mensaje" />}
+                    </MessageHeader>
+                    {props.type === 'text' && <MessageText>{props.message}</MessageText>}
+                    {props.type === 'image' && <MessageImage src={props.message} alt="Imagen enviada" />}
+                    <MessageHeaderTime>{props.time}</MessageHeaderTime>
+                </MessageContainer>
+            </MessageWrapper>}
+        </>
     );
 }
 

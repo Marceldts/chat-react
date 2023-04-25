@@ -1,4 +1,4 @@
-import { collection, addDoc, onSnapshot, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, getDocs, query, orderBy, limit, deleteDoc, doc, where } from "firebase/firestore";
 import { app, db } from "../firebase";
 
 export const messagesCollection = collection(db, "messages");
@@ -26,4 +26,10 @@ export const subscribeToMessages = (callback) => {
 export const addMessageToDatabase = async (message) => {
     await addDoc(messagesCollection, message);
 };
+
+export const deleteMessageFromDatabase = async (ms, email) => {
+    const deleteQuery = await query(messagesCollection, where("ms", "==", ms));
+    const querySnapshot = await getDocs(deleteQuery);
+    await deleteDoc(doc(db, "messages", querySnapshot.docs[0].id));
+}
 
