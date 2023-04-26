@@ -104,7 +104,6 @@ export const ChatPage = () => {
 
     const onMenuClicked = () => {
         setSideMenuOpen(!sideMenuOpen)
-        console.log(sideMenuOpen);
     };
 
     //We fetch the image and convert it to a blob to upload it to firebase storage
