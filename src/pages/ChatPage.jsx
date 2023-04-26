@@ -19,7 +19,7 @@ import Logout_icon from "../assets/Logout_icon.svg";
 import Send_icon from "../assets/Send_icon.svg";
 import Camera_icon from "../assets/Camera_icon.svg";
 
-//TO DO: Fix android logo, add  menu functionality
+//TO DO: Finish  menu functionality
 export const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -32,6 +32,8 @@ export const ChatPage = () => {
     const navigate = useNavigate();
     const bottomPageRef = useRef(null);
     const chatPageRef = useRef(null);
+
+    const opened = false;
 
 
     useLayoutEffect(() => {
@@ -68,7 +70,10 @@ export const ChatPage = () => {
     useEffect(() => {
         const sideMenu = document.getElementById("side-menu");
         const handleOutsideClick = (event) => {
-            if (sideMenuOpen && chatPageRef.current && (!sideMenu.contains(event.target) && event.target !== document.getElementById("hamburger-menu"))) {
+            if (event.target === document.getElementById("hamburger-side-menu")) {
+                setSideMenuOpen(!sideMenuOpen);
+            }
+            else if (sideMenuOpen && chatPageRef.current && (!sideMenu.contains(event.target) && event.target !== document.getElementById("hamburger-menu"))) {
                 setSideMenuOpen(false);
             }
         };
@@ -98,7 +103,8 @@ export const ChatPage = () => {
     }, [messages]);
 
     const onMenuClicked = () => {
-        setSideMenuOpen(true);
+        setSideMenuOpen(!sideMenuOpen)
+        console.log(sideMenuOpen);
     };
 
     //We fetch the image and convert it to a blob to upload it to firebase storage
@@ -174,7 +180,10 @@ export const ChatPage = () => {
                     <h2>Chat</h2>
                     <ToolbarElement id="logout" src={Logout_icon} alt="Logout icon" onClick={onLogout} />
                 </HeaderToolbar>
-                {sideMenuOpen && <SideMenu id="side-menu" items={[{ method: onlanguagechange, icon: Hamburger_icon, text: "Holaa" }, { method: onlanguagechange, icon: Hamburger_icon, text: "Adios" }]} open={sideMenuOpen} />}
+                {sideMenuOpen && <SideMenu id="side-menu" items={[
+                    { method: onlanguagechange, icon: Hamburger_icon, text: "Holaa" },
+                    { method: onlanguagechange, icon: Hamburger_icon, text: "Adios" }
+                ]} open={sideMenuOpen} />}
                 <MessagesContainer >
                     {messages.map((message, index) => {
                         return (
@@ -214,12 +223,13 @@ const ChatPageContainer = styled.div`
     min-height: 100vh;
 `;
 
-const HeaderToolbar = styled(Toolbar)`
+export const HeaderToolbar = styled(Toolbar)`
     position: fixed;
     top: 0;
     height: 50px;
     margin-bottom: 20px;
 `;
+
 const StyledInput = styled(Input)`
     height: 100%;
     padding: 10px 20px;

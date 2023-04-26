@@ -4,8 +4,8 @@ import styled from "styled-components";
 export const MenuItem = ({ method, icon, text, ...props }) => {
     return (
         <MenuItemContainer onClick={method}>
-            <MenuItemText>{text}</MenuItemText>
             <MenuItemIcon src={icon} alt={`${text}`} />
+            <MenuItemText>{text}</MenuItemText>
         </MenuItemContainer>
     );
 }
@@ -19,6 +19,7 @@ const MenuItemContainer = styled.div`
     height: 40px;
     cursor: pointer;
     margin-bottom: 10px;
+    padding-left: 10px;
     &:hover {
         background-color: #F2F2F2;
     };
@@ -26,14 +27,14 @@ const MenuItemContainer = styled.div`
 `;
 
 const MenuItemIcon = styled.img`
-    height: 20px;
-    width: 20px;
+    height: 30px;
+    width: 30px;
     object-fit: contain;
     margin-right: 10px;
 `;
 
 const MenuItemText = styled.span`
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     color: #333333;
     margin-left: 10px;
